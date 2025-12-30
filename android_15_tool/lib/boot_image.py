@@ -78,6 +78,14 @@ class BootImage:
             f.seek(dtb_offset)
             self.dtb = f.read(self.header['dtb_size'])
 
+        # For Android 15+, os_version might be in AVB footer
+        if self.header['os_version'] == 0:
+            # Placeholder for AVB footer parsing logic
+            # This would involve finding and parsing the AVB metadata
+            self.header['avb_os_version'] = "parsed_from_avb"
+            self.header['avb_security_patch'] = "parsed_from_avb"
+
+
     def unpack(self, output_dir):
         """
         Extracts the kernel, ramdisk, and DTB to the output directory.
