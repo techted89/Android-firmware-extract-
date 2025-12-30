@@ -1,2 +1,14 @@
+# Python build artifacts
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# Test artifacts
+.pytest_cache/
+*.log
+coverage.xml
+htmlcov/
