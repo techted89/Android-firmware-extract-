@@ -9,15 +9,6 @@ from android_15_tool.lib.erofs_parser import ErofsParser
 from android_15_tool.lib.boot_image import BootImage
 from android_15_tool.lib.dtc_handler import DtcHandler
 from android_15_tool.lib.repacker import Repacker
-from android_15_tool.device_dumper import dump_partition
-
-def handle_dump(args):
-    """Handles the 'dump' command."""
-    try:
-        dump_partition(args.partition, args.output_dir)
-    except (FileNotFoundError, subprocess.CalledProcessError) as e:
-        print(f"Error: {e}", file=sys.stderr)
-        sys.exit(1)
 
 def handle_search(args):
     """Handles the 'search' command."""
@@ -139,12 +130,6 @@ def main():
     parser_compile.add_argument("dts", help="Path to the input .dts file.")
     parser_compile.add_argument("dtb", help="Path to the output .dtb file.")
     parser_dtc.set_defaults(func=handle_dtc)
-
-    # Dump command
-    parser_dump = subparsers.add_parser("dump", help="Dump a partition from a rooted device.")
-    parser_dump.add_argument("partition", help="The name of the partition to dump (e.g., boot, vendor_boot).")
-    parser_dump.add_argument("output_dir", help="The directory to save the dumped image to.")
-    parser_dump.set_defaults(func=handle_dump)
 
     args = parser.parse_args()
     args.func(args)

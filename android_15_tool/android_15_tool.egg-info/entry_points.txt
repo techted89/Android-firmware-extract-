@@ -1,0 +1,2 @@
+[console_scripts]
+android-15-tool = android_15_tool.main:main

@@ -40,7 +40,18 @@ class SuperUnpacker:
         """
         Extracts the logical partitions to the output directory.
         """
-        raise NotImplementedError("Super partition unpacking is not yet implemented.")
+
+        try:
+            with open(self.filepath, 'rb') as f:
+                self._parse_metadata(f)
+
+                if not self.metadata or not self.metadata.get("partitions"):
+                    print("Warning: Metadata parsing is currently a placeholder.")
+                    print("No partitions were extracted.")
+                    return
+
+        except ValueError as e:
+            raise RuntimeError(f"Error processing super.img: {e}")
         except FileNotFoundError:
             raise RuntimeError(f"Input file not found: {self.filepath}")
         except IOError as e:
