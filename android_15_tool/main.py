@@ -9,6 +9,14 @@ from android_15_tool.lib.erofs_parser import ErofsParser
 from android_15_tool.lib.boot_image import BootImage
 from android_15_tool.lib.dtc_handler import DtcHandler
 from android_15_tool.lib.repacker import Repacker
+from android_15_tool.lib.tui.app import TuiApp
+
+
+def handle_tui(args):
+    """Handles the 'tui' command."""
+    app = TuiApp()
+    app.run()
+
 
 def handle_search(args):
     """Handles the 'search' command."""
@@ -130,6 +138,10 @@ def main():
     parser_compile.add_argument("dts", help="Path to the input .dts file.")
     parser_compile.add_argument("dtb", help="Path to the output .dtb file.")
     parser_dtc.set_defaults(func=handle_dtc)
+
+    # TUI command
+    parser_tui = subparsers.add_parser("tui", help="Launch the interactive TUI.")
+    parser_tui.set_defaults(func=handle_tui)
 
     args = parser.parse_args()
     args.func(args)

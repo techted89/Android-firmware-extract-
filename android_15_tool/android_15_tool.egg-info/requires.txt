@@ -1,0 +1,5 @@
+textual
+
+[dev]
+pytest
+pytest-asyncio==0.23.7

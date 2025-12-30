@@ -16,6 +16,15 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
+dependencies = [
+    "textual",
+]
 
 [project.scripts]
 android-15-tool = "android_15_tool.main:main"
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-asyncio==0.23.7",
+]
