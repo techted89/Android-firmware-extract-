@@ -1,0 +1,8 @@
+# Python build artifacts
+__pycache__/
+*.egg-info/
+
+# Test output directories
+test_output/
+test_output_boot_v2/
+.pytest_cache/
