@@ -5,7 +5,9 @@ import glob
 from android_15_tool.lib.boot_image import BootImage
 from android_15_tool.lib.super_unpacker import SuperUnpacker
 from android_15_tool.lib.unsparse import SparseImage
-from android_15_tool.lib.twrp_device_tree import create_twrp_device_tree
+from android_15_tool.lib.twrp_device_tree import create_twrp_device_tree, generate_twrp_fstab
+from android_15_tool.lib.scanner import MagicScanner
+from android_15_tool.lib.erofs_parser import ErofsParser
 
 
 class DeviceTreeBuilder:
@@ -29,6 +31,13 @@ class DeviceTreeBuilder:
         self._discover_firmware_files()
         self._combine_sparse_chunks()
         self._extract_and_assemble()
+        self._unpack_partition_filesystems()
+
+        fstab_files = self._find_fstab_files()
+        if fstab_files:
+            generate_twrp_fstab(fstab_files, self.device_tree_dir)
+        else:
+            print("Warning: No fstab files found.")
 
         if "super" in self.firmware_files:
             create_twrp_device_tree(self.firmware_files["super"], self.device_tree_dir)
@@ -64,6 +73,40 @@ class DeviceTreeBuilder:
         if "super_sparse" in self.firmware_files:
             self.firmware_files["super_sparse"].sort()
 
+    def _find_fstab_files(self):
+        """
+        Finds fstab files in the extracted partition filesystems.
+        """
+        fstab_files = []
+        for item in os.listdir(self.temp_dir):
+            item_path = os.path.join(self.temp_dir, item)
+            if os.path.isdir(item_path):
+                for root, _, files in os.walk(item_path):
+                    for file in files:
+                        if file.startswith("fstab"):
+                            fstab_files.append(os.path.join(root, file))
+        return fstab_files
+
+    def _unpack_partition_filesystems(self):
+        """
+        Unpacks the filesystems of the extracted partition images.
+        """
+        print("Unpacking partition filesystems...")
+        super_out_dir = os.path.join(self.temp_dir, "super")
+        for partition_img in os.listdir(super_out_dir):
+            if not partition_img.endswith(".img"):
+                continue
+
+            partition_path = os.path.join(super_out_dir, partition_img)
+            scanner = MagicScanner()
+            image_types = scanner.identify_image(partition_path)
+
+            if "EROFS Filesystem" in image_types:
+                print(f"Unpacking EROFS filesystem: {partition_img}")
+                erofs_out_dir = os.path.join(self.temp_dir, os.path.splitext(partition_img)[0])
+                parser = ErofsParser(partition_path)
+                parser.extract(erofs_out_dir)
+
     def _extract_and_assemble(self):
         """
         Extracts firmware images and assembles the device tree.
@@ -83,13 +126,6 @@ class DeviceTreeBuilder:
         super_out_dir = os.path.join(self.temp_dir, "super")
         unpacker = SuperUnpacker(super_img_path)
         unpacker.unpack(super_out_dir)
-
-        for partition_img in os.listdir(super_out_dir):
-            if partition_img.endswith(".img") and "fstab" in partition_img:
-                shutil.copy(
-                    os.path.join(super_out_dir, partition_img),
-                    os.path.join(self.device_tree_dir, partition_img)
-                )
 
     def _extract_boot(self, boot_img_path):
         """

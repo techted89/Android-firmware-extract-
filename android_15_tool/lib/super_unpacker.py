@@ -226,13 +226,14 @@ class SuperUnpacker:
                 "flags": flags,
             })
 
-    def unpack(self, output_dir):
+    def unpack(self, output_dir, partitions_to_extract=None):
         """
         Extracts the logical partitions to the output directory.
+        If partitions_to_extract is provided, only those partitions will be extracted.
         """
         try:
             with open(self.filepath, 'rb') as f:
-                self._parse_metadata(f)
+                self.parse()
 
                 if not os.path.exists(output_dir):
                     os.makedirs(output_dir)
@@ -255,6 +256,9 @@ class SuperUnpacker:
 
                 for partition in self.metadata["partitions"]:
                     partition_name = partition["name"]
+                    if partitions_to_extract and partition_name not in partitions_to_extract:
+                        continue
+
                     output_path = os.path.join(output_dir, f"{partition_name}.img")
 
                     with open(output_path, 'wb') as out_f:

@@ -49,8 +49,9 @@ def handle_extract(args):
 
         elif 'Super Partition' in image_types or 'Super Partition (Offset 4096)' in image_types:
             print("Handling as a super partition...")
+            partitions_to_extract = args.partitions.split(',') if args.partitions else None
             super_unpacker = SuperUnpacker(args.file)
-            super_unpacker.unpack(args.output_dir)
+            super_unpacker.unpack(args.output_dir, partitions_to_extract)
             print(f"Super partition unpacked to {args.output_dir}")
 
         elif 'EROFS Filesystem' in image_types:
@@ -115,6 +116,7 @@ def main():
     parser_extract = subparsers.add_parser("extract", help="Extract a firmware or recovery image.")
     parser_extract.add_argument("file", help="The image file to extract.")
     parser_extract.add_argument("output_dir", help="The directory to extract the files to.")
+    parser_extract.add_argument("--partitions", help="A comma-separated list of partitions to extract from a super.img.")
     parser_extract.set_defaults(func=handle_extract)
 
     # Repack command

@@ -19,7 +19,7 @@ python3 -m android_15_tool search <file>
 
 ### Extract
 ```bash
-python3 -m android_15_tool extract <file> <output_dir>
+python3 -m android_15_tool extract <file> <output_dir> [--partitions <partition1>,<partition2>,...]
 ```
 
 ### Repack
@@ -47,6 +47,7 @@ python3 -m android_15_tool twrp-tree <super.img> <output_dir>
 ```bash
 python3 -m android_15_tool build-twrp-tree <firmware_dir> <output_dir>
 ```
+This command automates the entire process of creating a TWRP device tree. It discovers firmware files, combines sparse chunks, extracts partitions and their filesystems, and generates a `BoardConfig.mk` with partition information and a `twrp.fstab` file.
 
 ### Generate TWRP Build Script
 ```bash
