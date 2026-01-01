@@ -1,6 +1,6 @@
 import os
 
-def generate_twrp_build_script(device_tree_dir):
+def generate_twrp_build_script(device_tree_dir, android_version):
     """
     Generates a shell script to build a TWRP recovery image.
     """
@@ -18,6 +18,8 @@ def generate_twrp_build_script(device_tree_dir):
     if not codename:
         raise ValueError("Could not determine device codename from BoardConfig.mk")
 
+    branch = get_twrp_branch(android_version)
+
     build_script_path = os.path.join(device_tree_dir, "build_twrp.sh")
     with open(build_script_path, "w") as f:
         f.write("#!/bin/bash\n\n")
@@ -28,13 +30,33 @@ def generate_twrp_build_script(device_tree_dir):
         f.write("export LC_ALL=C\n\n")
         f.write("mkdir -p ~/twrp\n")
         f.write("cd ~/twrp\n\n")
-        f.write("repo init --depth=1 -u git://github.com/minimal-manifest-twrp/platform_manifest_twrp_omni.git -b twrp-9.0\n")
+        f.write(f"repo init --depth=1 -u git://github.com/minimal-manifest-twrp/platform_manifest_twrp_omni.git -b {branch}\n")
         f.write("repo sync\n\n")
         f.write(f"mkdir -p device/vendor/{codename}\n")
         f.write(f"cp -r {os.path.abspath(device_tree_dir)}/* device/vendor/{codename}/\n\n")
+        f.write(f"echo \"Executing extract-files.sh...\"\n")
+        f.write(f"bash device/vendor/{codename}/extract-files.sh {os.path.abspath(os.path.join(device_tree_dir, 'root'))}\n\n")
         f.write("source build/envsetup.sh\n")
         f.write(f"lunch omni_{codename}-eng\n")
         f.write("mka recoveryimage\n")
 
     os.chmod(build_script_path, 0o755)
     print(f"TWRP build script generated at: {build_script_path}")
+
+def get_twrp_branch(android_version):
+    """
+    Determines the correct TWRP branch based on the Android version.
+    """
+    major_version = int(android_version.split(".")[0])
+    if major_version >= 13:
+        return "twrp-13"
+    elif major_version == 12:
+        return "twrp-12.1"
+    elif major_version == 11:
+        return "twrp-11"
+    elif major_version == 10:
+        return "twrp-10"
+    elif major_version == 9:
+        return "twrp-9.0"
+    else:
+        return "twrp-9.0"  # Default for older versions

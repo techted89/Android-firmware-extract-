@@ -47,10 +47,11 @@ python3 -m android_15_tool twrp-tree <super.img> <output_dir>
 ```bash
 python3 -m android_15_tool build-twrp-tree <firmware_dir> <output_dir>
 ```
-This command automates the entire process of creating a TWRP device tree. It discovers firmware files, combines sparse chunks, extracts partitions and their filesystems, merges them into a unified `root` directory, and generates a `BoardConfig.mk` with partition information and a `twrp.fstab` file.
+This command automates the entire process of creating a TWRP device tree. It discovers firmware files, combines sparse chunks, extracts partitions and their filesystems, and merges them into a unified `root` directory.
 
-### Generate TWRP Build Script
-```bash
-python3 -m android_15_tool generate-twrp-build <device_tree_dir>
-```
-This will generate a `build_twrp.sh` script in the specified device tree directory. You can then execute this script to build the TWRP recovery image.
+The tool then intelligently analyzes the extracted filesystem to:
+1.  **Detect the Android version** and generate a `build_twrp.sh` script that automatically selects the correct TWRP source branch for the build.
+2.  **Generate a `proprietary-files.txt` manifest** by scanning for common vendor files.
+3.  **Create an `extract-files.sh` script** that uses the manifest to copy all necessary vendor blobs into the device tree.
+
+The final output is a nearly complete, buildable TWRP device tree with an automated build script. Simply run `build_twrp.sh` to start the TWRP build process.
