@@ -20,6 +20,7 @@ class DeviceTreeBuilder:
         self.output_dir = output_dir
         self.temp_dir = os.path.join(output_dir, "temp")
         self.device_tree_dir = os.path.join(output_dir, "device_tree")
+        self.root_dir = os.path.join(self.device_tree_dir, "root")
         self.firmware_files = {}
 
     def build(self):
@@ -52,8 +53,8 @@ class DeviceTreeBuilder:
         """
         if not os.path.exists(self.temp_dir):
             os.makedirs(self.temp_dir)
-        if not os.path.exists(self.device_tree_dir):
-            os.makedirs(self.device_tree_dir)
+        if not os.path.exists(self.root_dir):
+            os.makedirs(self.root_dir)
 
     def _discover_firmware_files(self):
         """
@@ -75,16 +76,13 @@ class DeviceTreeBuilder:
 
     def _find_fstab_files(self):
         """
-        Finds fstab files in the extracted partition filesystems.
+        Finds fstab files in the root directory.
         """
         fstab_files = []
-        for item in os.listdir(self.temp_dir):
-            item_path = os.path.join(self.temp_dir, item)
-            if os.path.isdir(item_path):
-                for root, _, files in os.walk(item_path):
-                    for file in files:
-                        if file.startswith("fstab"):
-                            fstab_files.append(os.path.join(root, file))
+        for root, _, files in os.walk(self.root_dir):
+            for file in files:
+                if file.startswith("fstab"):
+                    fstab_files.append(os.path.join(root, file))
         return fstab_files
 
     def _unpack_partition_filesystems(self):
@@ -103,9 +101,12 @@ class DeviceTreeBuilder:
 
             if "EROFS Filesystem" in image_types:
                 print(f"Unpacking EROFS filesystem: {partition_img}")
-                erofs_out_dir = os.path.join(self.temp_dir, os.path.splitext(partition_img)[0])
+                staging_dir = os.path.join(self.temp_dir, os.path.splitext(partition_img)[0])
                 parser = ErofsParser(partition_path)
-                parser.extract(erofs_out_dir)
+                parser.extract(staging_dir)
+
+                # Merge the extracted files into the root directory
+                shutil.copytree(staging_dir, self.root_dir, dirs_exist_ok=True)
 
     def _extract_and_assemble(self):
         """
