@@ -21,7 +21,6 @@ python3 -m android_15_tool search <file>
 ```bash
 python3 -m android_15_tool extract <file> <output_dir>
 ```
-**Note:** The `super` partition unpacking is not yet implemented.
 
 ### Repack
 ```bash
@@ -37,4 +36,9 @@ python3 -m android_15_tool dtc compile <input.dts> <output.dtb>
 ### Dump
 ```bash
 python3 -m android_15_tool dump <partition_name> <output_dir>
+```
+
+### TWRP Tree
+```bash
+python3 -m android_15_tool twrp-tree <super.img> <output_dir>
 ```

@@ -10,6 +10,7 @@ from android_15_tool.lib.boot_image import BootImage
 from android_15_tool.lib.dtc_handler import DtcHandler
 from android_15_tool.lib.repacker import Repacker
 from android_15_tool.lib.tui.app import TuiApp
+from android_15_tool.lib.twrp_device_tree import create_twrp_device_tree
 
 
 def handle_tui(args):
@@ -142,6 +143,12 @@ def main():
     # TUI command
     parser_tui = subparsers.add_parser("tui", help="Launch the interactive TUI.")
     parser_tui.set_defaults(func=handle_tui)
+
+    # TWRP Tree command
+    parser_twrp_tree = subparsers.add_parser("twrp-tree", help="Create a TWRP device tree from a super.img.")
+    parser_twrp_tree.add_argument("super_img", help="Path to the super.img file.")
+    parser_twrp_tree.add_argument("output_dir", help="The directory to create the device tree in.")
+    parser_twrp_tree.set_defaults(func=lambda args: create_twrp_device_tree(args.super_img, args.output_dir))
 
     args = parser.parse_args()
     args.func(args)
