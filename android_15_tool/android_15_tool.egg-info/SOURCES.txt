@@ -23,5 +23,6 @@ lib/tui/widgets/__init__.py
 lib/tui/widgets/file_browser.py
 tests/test_integration.py
 tests/test_scanner.py
+tests/test_super_unpacker.py
 tests/test_tui.py
 tests/test_unsparse.py
