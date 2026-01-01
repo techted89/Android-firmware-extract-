@@ -12,6 +12,7 @@ from android_15_tool.lib.repacker import Repacker
 from android_15_tool.lib.tui.app import TuiApp
 from android_15_tool.lib.twrp_device_tree import create_twrp_device_tree
 from android_15_tool.lib.device_tree_builder import DeviceTreeBuilder
+from android_15_tool.lib.twrp_builder import generate_twrp_build_script
 
 
 def handle_tui(args):
@@ -156,6 +157,11 @@ def main():
     parser_build_twrp_tree.add_argument("firmware_dir", help="Directory containing firmware files.")
     parser_build_twrp_tree.add_argument("output_dir", help="The directory to create the device tree in.")
     parser_build_twrp_tree.set_defaults(func=lambda args: DeviceTreeBuilder(args.firmware_dir, args.output_dir).build())
+
+    # Generate TWRP Build command
+    parser_generate_twrp_build = subparsers.add_parser("generate-twrp-build", help="Generate a TWRP build script.")
+    parser_generate_twrp_build.add_argument("device_tree_dir", help="Directory containing the TWRP device tree.")
+    parser_generate_twrp_build.set_defaults(func=lambda args: generate_twrp_build_script(args.device_tree_dir))
 
     args = parser.parse_args()
     args.func(args)

@@ -47,3 +47,9 @@ python3 -m android_15_tool twrp-tree <super.img> <output_dir>
 ```bash
 python3 -m android_15_tool build-twrp-tree <firmware_dir> <output_dir>
 ```
+
+### Generate TWRP Build Script
+```bash
+python3 -m android_15_tool generate-twrp-build <device_tree_dir>
+```
+This will generate a `build_twrp.sh` script in the specified device tree directory. You can then execute this script to build the TWRP recovery image.
