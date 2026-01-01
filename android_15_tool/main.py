@@ -11,6 +11,7 @@ from android_15_tool.lib.dtc_handler import DtcHandler
 from android_15_tool.lib.repacker import Repacker
 from android_15_tool.lib.tui.app import TuiApp
 from android_15_tool.lib.twrp_device_tree import create_twrp_device_tree
+from android_15_tool.lib.device_tree_builder import DeviceTreeBuilder
 
 
 def handle_tui(args):
@@ -149,6 +150,12 @@ def main():
     parser_twrp_tree.add_argument("super_img", help="Path to the super.img file.")
     parser_twrp_tree.add_argument("output_dir", help="The directory to create the device tree in.")
     parser_twrp_tree.set_defaults(func=lambda args: create_twrp_device_tree(args.super_img, args.output_dir))
+
+    # Build TWRP Tree command
+    parser_build_twrp_tree = subparsers.add_parser("build-twrp-tree", help="Build a full TWRP device tree from firmware files.")
+    parser_build_twrp_tree.add_argument("firmware_dir", help="Directory containing firmware files.")
+    parser_build_twrp_tree.add_argument("output_dir", help="The directory to create the device tree in.")
+    parser_build_twrp_tree.set_defaults(func=lambda args: DeviceTreeBuilder(args.firmware_dir, args.output_dir).build())
 
     args = parser.parse_args()
     args.func(args)

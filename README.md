@@ -42,3 +42,8 @@ python3 -m android_15_tool dump <partition_name> <output_dir>
 ```bash
 python3 -m android_15_tool twrp-tree <super.img> <output_dir>
 ```
+
+### Build TWRP Tree
+```bash
+python3 -m android_15_tool build-twrp-tree <firmware_dir> <output_dir>
+```
